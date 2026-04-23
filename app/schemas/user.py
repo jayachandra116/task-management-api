@@ -1,25 +1,25 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
-class UserBase(BaseModel):
+class UserCreate(BaseModel):
+    """Request: register a new user."""
+
     email: EmailStr
+    password: str = Field(min_length=8)
 
 
-class UserCreate(UserBase):
-    """Schema for a new user registration(Request body)"""
-
-    password: str
-
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class User(UserBase):
-    """Schema for reading a user(Response body)"""
+class UserResponse(BaseModel):
+    """Response: never expose password."""
 
     id: int
+    email: str
+
+
+class PasswordChange(BaseModel):
+    """Request: Change user pwd"""
+
+    current_password: str
+    new_password: str = Field(min_length=8)
 
 
 class Token(BaseModel):
