@@ -3,20 +3,26 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class TaskBase(BaseModel):
-    title: str = Field(min_length=3)
-    description: Optional[str] = Field(min_length=3, max_length=100)
-    complete: bool = False
+class TaskCreate(BaseModel):
+    """Request: Create a new task - owner_id will be from JWT"""
+
+    title: str = Field(min_length=3, max_length=100)
+    description: Optional[str] = None
 
 
-class TaskCreate(TaskBase):
-    """Schema for creating a new task.(Request body)"""
+class TaskUpdate(BaseModel):
+    """Request: Partial update - every field optional."""
 
-    owner_id: int
+    title: Optional[str] = Field(None, min_length=3, max_length=100)
+    description: Optional[str] = None
+    complete: Optional[bool] = None
 
 
-class Task(TaskBase):
-    """Schema for reading a task.(Response body)"""
+class TaskResponse(BaseModel):
+    """Response: Full task details"""
 
     id: int
+    title: str
+    description: Optional[str]
+    complete: bool
     owner_id: int
