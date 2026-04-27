@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pyd
+*.pdb
+*.egg-info/
+.eggs/
+build/
+dist/
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+venv.bak/
+ENV/
+
+# Environment variables files
+*.env
+
+# Poetry / pipenv
+.poetry/
+poetry.lock
+Pipfile.lock
+
+# FastAPI / Uvicorn logs
+*.log
+
+# Editor / IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# Editor backups
+*~
+*.swp
+*.bak
+
+# Local configuration
+.local/
