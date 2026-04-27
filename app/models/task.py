@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 
@@ -11,3 +12,5 @@ class Task(Base):
     description = Column(String(255), nullable=True)
     complete = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    owner = relationship("User", back_populates="tasks")
