@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.db.session import get_db
-from app.models.user import User
+from app.models import User
 
 
 db_dependency = Annotated[Session, Depends(get_db)]

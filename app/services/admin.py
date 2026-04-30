@@ -2,12 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from starlette import status
 
 from app.api.deps import get_current_user, require_admin
 from app.db.session import get_db
-from app.models.user import User
-from app.core.security import verify_password, get_password_hash
+from app.models import User
 from app.schemas.user import UserRoleUpdate
 
 db_dependency = Annotated[Session, Depends(get_db)]

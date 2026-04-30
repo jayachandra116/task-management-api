@@ -5,8 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.db.session import get_db
-from app.models.task import Task
-from app.models.user import User, UserRole
+from app.models import User, UserRole, Task
 from app.schemas.task import TaskCreate, TaskUpdate
 
 db_dependency = Annotated[Session, Depends(get_db)]

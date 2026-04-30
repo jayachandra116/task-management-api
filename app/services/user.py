@@ -6,7 +6,7 @@ from starlette import status
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.user import User
+from app.models import User
 from app.core.security import verify_password, get_password_hash
 
 db_dependency = Annotated[Session, Depends(get_db)]
