@@ -26,3 +26,7 @@ class TaskResponse(BaseModel):
     description: Optional[str]
     complete: bool
     owner_id: int
+
+    model_config = {
+        "from_attributes": True,
+    }
