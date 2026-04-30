@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
+from app.models import UserRole
 
 
 class UserCreate(BaseModel):
@@ -13,7 +14,16 @@ class UserResponse(BaseModel):
 
     id: int
     email: str
+    role: UserRole
+    
+    model_config = {
+        "from_attributes": True,
+    }
 
+
+class UserRoleUpdate(BaseModel):
+    """admin can update user role"""
+    role: UserRole
 
 class PasswordChange(BaseModel):
     """Request: Change user pwd"""

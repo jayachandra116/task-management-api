@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
 from app.db.session import get_db
-from app.models.user import User
+from app.models import User, UserRole
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -28,3 +28,40 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="User no longer exists"
         )
     return user
+
+
+def require_role(*roles: UserRole):
+    """
+    Factory that returns a dependency allowing only the specified roles.
+
+    Usage:
+        Depends(require_role(UserRole.admin))
+        Depends(require_role(UserRole.admin, UserRole.user))
+    """
+
+    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Required roles: {[r.value for r in roles]}",
+            )
+        return current_user
+
+    return role_checker
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
+        )
+    return current_user
+
+
+def require_user(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != UserRole.user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User role required",
+        )
+    return current_user
