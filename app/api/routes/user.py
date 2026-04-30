@@ -53,7 +53,7 @@ def update_user_role(
     db: db_dependency,
     current_user: User = Depends(require_admin),
 ):
-    admin.update_user_role(user_id, payload, db, current_user)
+    return admin.update_user_role(user_id, payload, db, current_user)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

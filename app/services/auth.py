@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.db.session import get_db
 from app.models import User
+from app.models.user import UserRole
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -27,7 +28,7 @@ def register_user(db: db_dependency, email: str, password: str):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed = get_password_hash(password)
-    user = User(email=email, hashed_password=hashed)
+    user = User(email=email, hashed_password=hashed, role=UserRole.user)
     db.add(user)
     db.commit()
     db.refresh(user)
