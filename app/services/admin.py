@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, require_admin
 from app.db.session import get_db
 from app.models import User
 from app.schemas.user import UserRoleUpdate
+from app.utils.pagination import paginate
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[User, Depends(get_current_user)]
@@ -19,8 +20,11 @@ user_dependency = Annotated[User, Depends(get_current_user)]
 def list_all_users(
     db: Session = Depends(get_db),
     _: User = Depends(require_admin),
+    page: int = Query(default=1, ge=1, description="Page number"),
+    size: int = Query(default=10, ge=1, le=100, description="Items per page"),
 ):
-    return db.query(User).all()
+    query = db.query(User)
+    return paginate(query, page, size)
 
 
 def get_user(

@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.db.session import get_db
 from app.models import User, UserRole, Task
 from app.schemas.task import TaskCreate, TaskUpdate
+from app.utils.pagination import paginate
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[User, Depends(deps.get_current_user)]
@@ -39,10 +40,16 @@ def create_new_task(
     return new_task
 
 
-def get_all_current_user_tasks(db: db_dependency, current_user: user_dependency):
-    if current_user.role == UserRole.admin:
-        return db.query(Task).all()
-    return db.query(Task).filter(Task.owner_id == current_user.id).all()
+def get_all_current_user_tasks(
+    db: db_dependency,
+    current_user: user_dependency,
+    page: int = Query(default=1, ge=1, description="Page number"),
+    size: int = Query(default=10, ge=1, le=100, description="Items per page"),
+):
+    query = db.query(Task)
+    if current_user.role != UserRole.admin:
+        query = query.filter(Task.owner_id == current_user.id)
+    return paginate(query, page, size)
 
 
 def get_task_by_id(task_id: int, db: db_dependency, current_user: user_dependency):
