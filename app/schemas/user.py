@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from app.models import UserRole
+from app.schemas.pagination import PaginatedResponse
 
 
 class UserCreate(BaseModel):
@@ -15,7 +16,7 @@ class UserResponse(BaseModel):
     id: int
     email: str
     role: UserRole
-    
+
     model_config = {
         "from_attributes": True,
     }
@@ -23,7 +24,9 @@ class UserResponse(BaseModel):
 
 class UserRoleUpdate(BaseModel):
     """admin can update user role"""
+
     role: UserRole
+
 
 class PasswordChange(BaseModel):
     """Request: Change user pwd"""
@@ -35,3 +38,7 @@ class PasswordChange(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+# paginated user response — used in admin list routes
+UserPaginatedResponse = PaginatedResponse[UserResponse]

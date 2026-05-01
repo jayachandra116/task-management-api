@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from app.schemas.pagination import PaginatedResponse
+
 
 class TaskCreate(BaseModel):
     """Request: Create a new task - owner_id will be from JWT"""
@@ -30,3 +32,7 @@ class TaskResponse(BaseModel):
     model_config = {
         "from_attributes": True,
     }
+
+
+# paginated task response — used as the return type in list routes
+TaskPaginatedResponse = PaginatedResponse[TaskResponse]
