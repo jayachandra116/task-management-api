@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -7,7 +7,12 @@ from starlette import status
 from app.api.deps import get_current_user, require_admin
 from app.db.session import get_db
 from app.models import User
-from app.schemas.user import UserResponse, PasswordChange, UserRoleUpdate
+from app.schemas.user import (
+    UserPaginatedResponse,
+    UserResponse,
+    PasswordChange,
+    UserRoleUpdate,
+)
 from app.services.user import change_user_password
 from app.services import admin
 
@@ -32,7 +37,7 @@ async def change_current_user_password(
 
 
 # For admin
-@router.get("/", response_model=List[UserResponse])
+@router.get("/", response_model=UserPaginatedResponse)
 def list_users(
     db: db_dependency,
     user: User = Depends(require_admin),

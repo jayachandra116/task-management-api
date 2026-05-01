@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from starlette import status
@@ -6,8 +6,7 @@ from starlette import status
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models import User
-from app.schemas.task import TaskCreate, TaskResponse, TaskUpdate
-from app.schemas.user import UserPaginatedResponse
+from app.schemas.task import TaskCreate, TaskResponse, TaskUpdate, TaskPaginatedResponse
 from app.services.task import (
     create_new_task,
     delete_task_by_id,
@@ -29,7 +28,7 @@ async def create_task(
     return create_new_task(db, current_user, payload)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=UserPaginatedResponse)
+@router.get("/", status_code=status.HTTP_200_OK, response_model=TaskPaginatedResponse)
 async def get_all_tasks(
     db: db_dependency,
     current_user: user_dependency,

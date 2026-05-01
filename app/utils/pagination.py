@@ -11,7 +11,7 @@ def paginate(query: Query, page: int, size: int) -> dict:
     """Takes a SQLAlchemy query, page and size.
     Return a dict with items and meta - ready to return from any route.
     """
-    total_items = query.items()
+    total_items = query.count()
     total_pages = ceil(total_items / size) if total_items > 0 else 1
     offset = (page - 1) * size
 
