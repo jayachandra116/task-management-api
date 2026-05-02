@@ -1,5 +1,3 @@
-
-
 def test_register_success(client):
     response = client.post(
         "/auth/register", json={"email": "new@test.com", "password": "password123"}

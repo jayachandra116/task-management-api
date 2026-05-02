@@ -1,5 +1,3 @@
-
-
 def test_create_task(client, user_token):
     response = client.post(
         "/tasks/",
@@ -8,7 +6,7 @@ def test_create_task(client, user_token):
     )
     assert response.status_code == 201
     assert response.json()["title"] == "Test task"
-    assert response.json()["complete"] == False
+    assert response.json()["complete"] is False
 
 
 def test_list_tasks_paginated(client, user_token):
@@ -28,7 +26,7 @@ def test_list_tasks_paginated(client, user_token):
     data = response.json()
     assert len(data["items"]) == 2
     assert data["meta"]["total_items"] == 3
-    assert data["meta"]["has_next"] == True
+    assert data["meta"]["has_next"] is True
 
 
 def test_filter_tasks_by_complete(client, user_token):

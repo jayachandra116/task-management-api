@@ -24,6 +24,7 @@ ENV/
 
 # Environment variables files
 *.env
+.env.test
 
 # Poetry / pipenv
 .poetry/

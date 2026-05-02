@@ -1,19 +1,23 @@
-# tests/conftest.py
-
+import os
 import pytest
+
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 from app.main import app
 from app.db.base import Base
 from app.db.session import get_db
 from app.models import User, UserRole
 from app.core.security import get_password_hash
 
-# use a separate test database
-TEST_DATABASE_URL = "postgresql://testuser:testpass@localhost/testdb"
+load_dotenv(".env.test")
 
-engine = create_engine(TEST_DATABASE_URL)
+# use a separate test database
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = create_engine(DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -52,7 +56,7 @@ def db():
 def regular_user(db):
     user = User(
         email="user@test.com",
-        password=get_password_hash("testpass123"),
+        hashed_password=get_password_hash("testpass123"),
         role=UserRole.user,
     )
     db.add(user)
@@ -65,7 +69,7 @@ def regular_user(db):
 def admin_user(db):
     user = User(
         email="admin@test.com",
-        password=get_password_hash("adminpass123"),
+        hashed_password=get_password_hash("adminpass123"),
         role=UserRole.admin,
     )
     db.add(user)
