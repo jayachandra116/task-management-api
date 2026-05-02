@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.db.session import get_db
 from app.models import User, UserRole, Task
+from app.schemas.filters import TaskFilterParams
 from app.schemas.task import TaskCreate, TaskUpdate
+from app.utils.filters import apply_task_filters
 from app.utils.pagination import paginate
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -40,15 +42,17 @@ def create_new_task(
     return new_task
 
 
-def get_all_current_user_tasks(
+def get_current_user_tasks(
     db: db_dependency,
     current_user: user_dependency,
+    filters: TaskFilterParams,
     page: int = Query(default=1, ge=1, description="Page number"),
     size: int = Query(default=10, ge=1, le=100, description="Items per page"),
 ):
     query = db.query(Task)
     if current_user.role != UserRole.admin:
         query = query.filter(Task.owner_id == current_user.id)
+    query = apply_task_filters(query=query, filters=filters)
     return paginate(query, page, size)
 
 
