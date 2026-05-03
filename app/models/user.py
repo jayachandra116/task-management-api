@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, Integer, String,Enum
+from sqlalchemy import Column, Integer, String, Enum
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -18,6 +18,11 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
 
-    role = Column(Enum(UserRole), default=UserRole.user, nullable=False, server_default=UserRole.user)
+    role = Column(
+        Enum(UserRole),
+        default=UserRole.user,
+        nullable=False,
+        server_default=UserRole.user,
+    )
 
     tasks = relationship("Task", back_populates="owner")
