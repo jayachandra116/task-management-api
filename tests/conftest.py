@@ -81,7 +81,7 @@ def admin_user(db):
 @pytest.fixture
 def user_token(client, regular_user):
     response = client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         data={"username": "user@test.com", "password": "testpass123"},
     )
     return response.json()["access_token"]
@@ -90,7 +90,7 @@ def user_token(client, regular_user):
 @pytest.fixture
 def admin_token(client, admin_user):
     response = client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         data={"username": "admin@test.com", "password": "adminpass123"},
     )
     return response.json()["access_token"]
