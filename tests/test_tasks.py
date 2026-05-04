@@ -1,6 +1,6 @@
 def test_create_task(client, user_token):
     response = client.post(
-        "/tasks/",
+        "/api/v1/tasks/",
         json={"title": "Test task", "description": "Test desc"},
         headers={"Authorization": f"Bearer {user_token}"},
     )
@@ -13,13 +13,13 @@ def test_list_tasks_paginated(client, user_token):
     # create 3 tasks
     for i in range(3):
         client.post(
-            "/tasks/",
+            "/api/v1/tasks/",
             json={"title": f"Task {i}"},
             headers={"Authorization": f"Bearer {user_token}"},
         )
 
     response = client.get(
-        "/tasks/?page=1&size=2",
+        "/api/v1/tasks/?page=1&size=2",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 200
@@ -31,12 +31,12 @@ def test_list_tasks_paginated(client, user_token):
 
 def test_filter_tasks_by_complete(client, user_token):
     client.post(
-        "/tasks/",
+        "/api/v1/tasks/",
         json={"title": "Task A"},
         headers={"Authorization": f"Bearer {user_token}"},
     )
     response = client.get(
-        "/tasks/?complete=false",
+        "/api/v1/tasks/?complete=false",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 200
@@ -45,18 +45,18 @@ def test_filter_tasks_by_complete(client, user_token):
 
 def test_filter_tasks_by_search(client, user_token):
     client.post(
-        "/tasks/",
+        "/api/v1/tasks/",
         json={"title": "Fix login bug"},
         headers={"Authorization": f"Bearer {user_token}"},
     )
     client.post(
-        "/tasks/",
+        "/api/v1/tasks/",
         json={"title": "Write docs"},
         headers={"Authorization": f"Bearer {user_token}"},
     )
 
     response = client.get(
-        "/tasks/?search=bug",
+        "/api/v1/tasks/?search=bug",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 200
@@ -72,7 +72,7 @@ def test_delete_task_unauthorized(client, user_token, admin_user, db):
     db.commit()
 
     response = client.delete(
-        f"/tasks/{task.id}",
+        f"/api/v1/tasks/{task.id}",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 403
