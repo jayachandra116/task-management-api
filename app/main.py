@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.routes import auth, task, user
+from app.api.v1.routers import user, auth, task
 
 
 app = FastAPI(title="Task Management API")
