@@ -3,7 +3,7 @@ import pytest
 from dotenv import load_dotenv
 
 # Load the environment before importing app-specific modules
-load_dotenv(".env.test", override=True)  
+load_dotenv(".env.test", override=True)
 
 # ruff: noqa: E402
 from alembic.config import Config
