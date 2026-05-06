@@ -1,9 +1,13 @@
 import os
 import pytest
-
 from dotenv import load_dotenv
-from fastapi.testclient import TestClient
+
+load_dotenv(".env.test", override=True)
+
+from alembic.config import Config
+from alembic import command
 from sqlalchemy import create_engine
+from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker
 
 from app.main import app
@@ -12,44 +16,55 @@ from app.db.session import get_db
 from app.models import User, UserRole
 from app.core.security import get_password_hash
 
-load_dotenv(".env.test")
-
-# use a separate test database
+# Global test engine setup
 DATABASE_URL = os.getenv("DATABASE_URL")
-
-engine = create_engine(DATABASE_URL)
+if not DATABASE_URL or "5433" not in DATABASE_URL:
+    raise ValueError("DATABASE_URL in .env.test must point to port 5433")
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    """Create all tables before each test, drop after."""
-    Base.metadata.create_all(bind=engine)
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_database():
+    """Initializes the schema once per test session."""
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
     yield
-    Base.metadata.drop_all(bind=engine)
-
-
-@pytest.fixture
-def client():
-    app.dependency_overrides[get_db] = override_get_db
-    return TestClient(app)
+    # Optional: Base.metadata.drop_all(bind=engine)
+    # Usually better to leave it for manual inspection if a run fails
 
 
 @pytest.fixture
 def db():
-    db = TestingSessionLocal()
+    """
+    Creates a fresh database session for a test.
+    Wraps the session in a transaction that rolls back after the test.
+    """
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
     try:
-        yield db
+        yield session
     finally:
-        db.close()
+        session.close()
+        transaction.rollback()
+        connection.close()
+
+
+@pytest.fixture
+def client(db):
+    """Overrides the get_db dependency to use the transactional test session."""
+
+    def override_get_db():
+        try:
+            yield db
+        finally:
+            pass  # Session cleanup is handled by the db fixture
+
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
@@ -60,8 +75,8 @@ def regular_user(db):
         role=UserRole.user,
     )
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    # Use flush instead of commit to stay within the transaction
+    db.flush()
     return user
 
 
@@ -73,8 +88,7 @@ def admin_user(db):
         role=UserRole.admin,
     )
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    db.flush()
     return user
 
 
@@ -84,7 +98,7 @@ def user_token(client, regular_user):
         "/api/v1/auth/login",
         data={"username": "user@test.com", "password": "testpass123"},
     )
-    return response.json()["access_token"]
+    return response.json().get("access_token")
 
 
 @pytest.fixture
@@ -93,4 +107,4 @@ def admin_token(client, admin_user):
         "/api/v1/auth/login",
         data={"username": "admin@test.com", "password": "adminpass123"},
     )
-    return response.json()["access_token"]
+    return response.json().get("access_token")
