@@ -2,19 +2,19 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-load_dotenv(".env.test", override=True)
+# Load the environment before importing app-specific modules
+load_dotenv(".env.test", override=True)  # noqa: E402
 
 from alembic.config import Config
 from alembic import command
-from sqlalchemy import create_engine
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.main import app
-from app.db.base import Base
-from app.db.session import get_db
-from app.models import User, UserRole
 from app.core.security import get_password_hash
+from app.db.session import get_db
+from app.main import app
+from app.models import User, UserRole
 
 # Global test engine setup
 DATABASE_URL = os.getenv("DATABASE_URL")
