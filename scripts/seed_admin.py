@@ -1,16 +1,23 @@
 import os
 import sys
-
 from dotenv import load_dotenv
-
-from app.db.session import SessionLocal
-from app.models import User, UserRole
-from app.core.security import get_password_hash
 
 load_dotenv()
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.models import User, UserRole
+from app.core.security import get_password_hash
+
+
 ADMIN_EMAIL = os.getenv("FIRST_ADMIN_EMAIL")
 ADMIN_PASSWORD = os.getenv("FIRST_ADMIN_PASSWORD")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = DATABASE_URL.replace("@db:", "@localhost:")
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def seed_admin():
