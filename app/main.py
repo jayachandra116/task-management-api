@@ -1,20 +1,27 @@
 from fastapi import FastAPI
-from app.api.routes import auth, task, user
+from app.api.v1.router import router as v1_router
 
 
-app = FastAPI(title="Task Management API")
+app = FastAPI(
+    title="Task Management API",
+    description="Task Management API with versioning",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
-# Authentication
-app.include_router(auth.router)
-
-# Task
-app.include_router(task.router)
-
-# Users
-app.include_router(user.router)
+app.include_router(v1_router)
 
 
 # Root
 @app.get("/")
-def read_root():
-    return {"message": "API is running"}
+def root():
+    return {
+        "message": "Task management API",
+        "versions": {"v1": "/app/v1"},
+        "docs": "/docs",
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
