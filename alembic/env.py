@@ -1,23 +1,15 @@
 from logging.config import fileConfig
-import os
-
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
 
 from app.db.base import Base
-from app import models
+from app.core.config import get_settings
+from app import models  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-
-# Get the database URL from the environment variable
-db_url = os.getenv("DATABASE_URL")
-if db_url:
-    # This overrides the sqlalchemy.url line in alembic.ini
-    config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -49,6 +41,9 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+    if not url:
+        settings = get_settings()
+        url = str(settings.DATABASE_URL)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -67,8 +62,19 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # Try to get the URL from the Config object (set by conftest.py)
+    cmd_line_url = config.get_main_option("sqlalchemy.url")
+    if cmd_line_url:
+        url = cmd_line_url
+    else:
+        # Fallback to default settings if running manually (e.g., 'alembic upgrade head')
+        settings = get_settings()
+        url = str(settings.DATABASE_URL)
+    # Build configuration dictionary
+    configuration = config.get_section(config.config_ini_section) or {}
+    configuration["sqlalchemy.url"] = url.strip()
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
