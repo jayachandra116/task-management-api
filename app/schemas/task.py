@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.schemas.pagination import PaginatedResponse
 
@@ -11,6 +11,11 @@ class TaskCreate(BaseModel):
     title: str = Field(min_length=3, max_length=100)
     description: Optional[str] = None
 
+    @field_validator("title")
+    @classmethod
+    def strip_title(cls, v: str) -> str:
+        return v.strip()
+
 
 class TaskUpdate(BaseModel):
     """Request: Partial update - every field optional."""
@@ -18,6 +23,13 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=3, max_length=100)
     description: Optional[str] = None
     complete: Optional[bool] = None
+
+    @field_validator("title")
+    @classmethod
+    def strip_title(cls, v: str) -> str:
+        if v is not None:
+            return v.strip()
+        return v
 
 
 class TaskResponse(BaseModel):

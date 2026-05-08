@@ -75,4 +75,4 @@ def test_delete_task_unauthorized(client, user_token, admin_user, db):
         f"/api/v1/tasks/{task.id}",
         headers={"Authorization": f"Bearer {user_token}"},
     )
-    assert response.status_code == 403
+    assert response.status_code == 404

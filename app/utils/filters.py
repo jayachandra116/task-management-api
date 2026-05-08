@@ -13,8 +13,8 @@ def apply_task_filters(query: Query, filters: TaskFilterParams) -> Query:
     if filters.complete is not None:
         query = query.filter(Task.complete == filters.complete)
 
-    if filters.search is not None:
-        search_term = f"%{filters.search}%"
+    if filters.search is not None and filters.search.strip():
+        search_term = f"%{filters.search.strip()}%"
         query = query.filter(
             or_(Task.title.ilike(search_term), Task.description.ilike(search_term))
         )
