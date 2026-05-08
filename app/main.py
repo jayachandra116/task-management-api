@@ -17,7 +17,7 @@ app.include_router(v1_router)
 def root():
     return {
         "message": "Task management API",
-        "versions": {"v1": "/app/v1"},
+        "versions": {"v1": "/api/v1"},
         "docs": "/docs",
     }
 
