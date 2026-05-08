@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Query
+from fastapi import Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api import deps
@@ -24,7 +24,10 @@ def get_task_or_404(task_id: int, db: db_dependency):
 
 def check_task_owership(task: Task, current_user: User):
     if current_user.role != UserRole.admin and task.owner_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Task not found"
+        )
 
 
 def create_new_task(
