@@ -22,14 +22,28 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[User, Depends(get_current_user)]
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=TaskResponse)
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=TaskResponse,
+    summary="Create a new task",
+    description="Create new task for the currently logged in user",
+    tags=["Task"],
+)
 async def create_task(
     payload: TaskCreate, db: db_dependency, current_user: user_dependency
 ):
     return create_new_task(db, current_user, payload)
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=TaskPaginatedResponse)
+@router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    response_model=TaskPaginatedResponse,
+    summary="List the tasks",
+    description="List all the tasks for the currently logged in users",
+    tags=["Task"],
+)
 async def list_tasks(
     db: db_dependency,
     current_user: user_dependency,
@@ -46,18 +60,39 @@ async def list_tasks(
     return get_current_user_tasks(db, current_user, filters, page, size)
 
 
-@router.get("/{task_id}", status_code=status.HTTP_200_OK, response_model=TaskResponse)
+@router.get(
+    "/{task_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=TaskResponse,
+    summary="Get the task details",
+    description="Get the task by its id of the currently logged in user",
+    tags=["Task"],
+)
 async def get_task(task_id: int, db: db_dependency, current_user: user_dependency):
     return get_task_by_id(task_id, db, current_user)
 
 
-@router.patch("/{task_id}", response_model=TaskResponse)
+@router.patch(
+    "/{task_id}",
+    response_model=TaskResponse,
+    summary="Update a task",
+    description="Update a task by its Id of the currently logged in user",
+    tags=["Task"],
+)
 async def update_task(
-    task_id: int, payload: TaskUpdate, db: db_dependency, current_user: user_dependency
+    task_id: int,
+    payload: TaskUpdate,
+    db: db_dependency,
+    current_user: user_dependency,
 ):
     return update_task_by_id(task_id, payload, db, current_user)
 
 
-@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{task_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a task",
+    description="Delete a task by its id of the currently logged in user",
+)
 async def delete_task(task_id: int, db: db_dependency, current_user: user_dependency):
     return delete_task_by_id(task_id, db, current_user)
