@@ -28,7 +28,7 @@ user_dependency = Annotated[User, Depends(get_current_user)]
     response_model=TaskResponse,
     summary="Create a new task",
     description="Create new task for the currently logged in user",
-    tags=["Task"],
+    tags=["Tasks"],
 )
 async def create_task(
     payload: TaskCreate, db: db_dependency, current_user: user_dependency
@@ -42,7 +42,7 @@ async def create_task(
     response_model=TaskPaginatedResponse,
     summary="List the tasks",
     description="List all the tasks for the currently logged in users",
-    tags=["Task"],
+    tags=["Tasks"],
 )
 async def list_tasks(
     db: db_dependency,
@@ -66,7 +66,7 @@ async def list_tasks(
     response_model=TaskResponse,
     summary="Get the task details",
     description="Get the task by its id of the currently logged in user",
-    tags=["Task"],
+    tags=["Tasks"],
 )
 async def get_task(task_id: int, db: db_dependency, current_user: user_dependency):
     return get_task_by_id(task_id, db, current_user)
@@ -77,7 +77,7 @@ async def get_task(task_id: int, db: db_dependency, current_user: user_dependenc
     response_model=TaskResponse,
     summary="Update a task",
     description="Update a task by its Id of the currently logged in user",
-    tags=["Task"],
+    tags=["Tasks"],
 )
 async def update_task(
     task_id: int,
@@ -93,6 +93,7 @@ async def update_task(
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a task",
     description="Delete a task by its id of the currently logged in user",
+    tags=["Tasks"],
 )
 async def delete_task(task_id: int, db: db_dependency, current_user: user_dependency):
     return delete_task_by_id(task_id, db, current_user)

@@ -69,7 +69,7 @@ def list_users(
 @router.get(
     "/{user_id}",
     response_model=UserResponse,
-    tags=["User"],
+    tags=["Admin"],
     summary="Get the user details",
     description="Get the user details to the admin users",
 )
@@ -84,7 +84,7 @@ def get_user(
 @router.patch(
     "/{user_id}/role",
     response_model=UserResponse,
-    tags=["User"],
+    tags=["Admin"],
     summary="Update the user",
     description="Update the given user by admin users",
 )
@@ -100,7 +100,7 @@ def update_user_role(
 @router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    tags=["User"],
+    tags=["Admin"],
     summary="Delete a user",
     description="Delete the given user by admin users",
 )
