@@ -7,7 +7,9 @@ class UserCreate(BaseModel):
     """Request: register a new user."""
 
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: str = Field(
+        min_length=8, description="Plain text password, Will be hashed before saving."
+    )
 
 
 class UserResponse(BaseModel):
@@ -31,13 +33,17 @@ class UserRoleUpdate(BaseModel):
 class PasswordChange(BaseModel):
     """Request: Change user pwd"""
 
-    current_password: str
-    new_password: str = Field(min_length=8)
+    current_password: str = Field(
+        min_length=8, description="Current plain text password"
+    )
+    new_password: str = Field(
+        min_length=8, description="New plain test password to use"
+    )
 
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    access_token: str = Field(description="Access token")
+    token_type: str = Field(description="Token type")
 
 
 # paginated user response — used in admin list routes
