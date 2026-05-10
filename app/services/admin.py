@@ -22,7 +22,17 @@ def list_all_users(
     _: User = Depends(require_admin),
     page: int = Query(default=1, ge=1, description="Page number"),
     size: int = Query(default=10, ge=1, le=100, description="Items per page"),
-):
+) -> dict:
+    """List all the users in the DB
+
+    Args:
+        db (Session): Database session
+        page (int): Page number of the response to get
+        size (int): Items per page
+
+    Returns:
+        dict: Paginated response
+    """
     query = db.query(User)
     return paginate(query, page, size)
 
@@ -31,7 +41,20 @@ def get_user(
     user_id: int,
     db: Session = Depends(get_db),
     _: User = Depends(require_admin),
-):
+) -> User:
+    """Get the user
+
+    Args:
+        user_id (int): User id to get
+        db (Session): Database session to use
+
+    Returns:
+        User: User object
+
+    Raises:
+        HTTPException: Raised when the user to retrieve is not found.
+    """
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -43,7 +66,21 @@ def update_user_role(
     payload: UserRoleUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),  # only admins can change roles
-):
+) -> User:
+    """Returns the updated user
+
+    Args:
+        user_id (int): User id to update
+        payload (UserRoleUpdate): Role details
+        db (Session): Database session to use
+        current_user (User): Current admin user
+
+    Returns:
+        User: Updated user object
+
+    Raises:
+        HTTPException: Raised If the current user wants to change their own role
+    """
     if current_user.id == user_id:
         raise HTTPException(
             status_code=400, detail="Admins cannot change their own role"
@@ -63,7 +100,17 @@ def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
-):
+) -> None:
+    """Delete a user from database
+
+    Args:
+        user_id (int): User id to delete
+        db (Session): Database session to use
+        current_user (User): Current logged in user
+
+    Raises:
+        HTTPException: Raised when the user to delete is not found.
+    """
     if current_user.id == user_id:
         raise HTTPException(status_code=400, detail="Admins cannot delete themselves")
 
