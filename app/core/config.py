@@ -8,6 +8,13 @@ from functools import lru_cache
 def get_settings(env_file: str = ".env"):
     """
     Creates a cached instance of the settings.
+
+    Args:
+        emv_file (str): Environment file to get the settings from.
+            Defaults to '.env'
+
+    Returns:
+        Settings: Settings object
     """
     # print(f"Creating settings from file: {env_file}")
     return Settings(_env_file=env_file, _env_file_encoding="utf-8")

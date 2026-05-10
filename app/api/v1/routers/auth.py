@@ -16,13 +16,27 @@ oauth_dependency = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 @router.post(
-    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+    "/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Creates a new user",
+    tags=["Auth"],
+    description="""
+        Registers a new user account with email must be unique
+    """,
 )
 async def register(user: UserCreate, db: db_dependency):
     return register_user(db, user.email, user.password)
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    status_code=status.HTTP_200_OK,
+    summary="Login user",
+    description="Login the registered user and returns the token",
+    tags=["Auth"],
+)
 async def login(form: oauth_dependency, db: db_dependency):
     token = authenticate_user(form.username, form.password, db)
     if not token:
