@@ -16,7 +16,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def seed_admin():
-    if not settings.FIRST_ADMIN_PASSWORD:
+    if not settings.FIRST_ADMIN_PASSWORD.get_secret_value():
         print("Error: FIRST_ADMIN_PASSWORD environment variable is not set")
         sys.exit(1)
     try:
@@ -29,7 +29,9 @@ def seed_admin():
             return
         admin = User(
             email=settings.FIRST_ADMIN_EMAIL,
-            hashed_password=get_password_hash(settings.FIRST_ADMIN_PASSWORD),
+            hashed_password=get_password_hash(
+                settings.FIRST_ADMIN_PASSWORD.get_secret_value()
+            ),
             role=UserRole.admin,
         )
         db.add(admin)
