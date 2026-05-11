@@ -32,7 +32,7 @@ class Settings(BaseSettings):
 
     # --- Database Settings ---
     POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+    POSTGRES_PASSWORD: SecretStr
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
@@ -59,7 +59,7 @@ class Settings(BaseSettings):
             return v
         # Otherwise, build it from components (useful for local vs docker)
         user = info.data.get("POSTGRES_USER")
-        password = info.data.get("POSTGRES_PASSWORD")
+        password = info.data.get("POSTGRES_PASSWORD").get_secret_value()
         server = info.data.get("POSTGRES_SERVER")
         port = info.data.get("POSTGRES_PORT")
         db = info.data.get("POSTGRES_DB")
