@@ -6,7 +6,6 @@ from passlib.context import CryptContext
 from app.core.config import get_settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-settings = get_settings()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -44,6 +43,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     Returns:
         str: Access token created from the data
     """
+    settings = get_settings()
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -64,6 +64,7 @@ def decode_access_token(token: str) -> dict:
     Raises:
         JWTError: Raised when the email or user id not present in the token
     """
+    settings = get_settings()
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     user_email: str = payload.get("sub")
     user_id: int = payload.get("id")
