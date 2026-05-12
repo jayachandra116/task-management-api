@@ -1,10 +1,8 @@
 import logging
 
 from alembic.config import Config
-from alembic.environment import ScriptDirectory
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from alembic.config import Config
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
