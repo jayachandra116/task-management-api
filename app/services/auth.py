@@ -5,9 +5,14 @@ from sqlalchemy.orm import Session
 
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.db.session import get_db
+from app.exceptions import ConflictException
 from app.models import User
 from app.models.user import UserRole
+import logging
 
+from app.utils.db import db_transaction
+
+logger = logging.getLogger(__name__)
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
@@ -34,6 +39,7 @@ def authenticate_user(email: str, password: str, db: db_dependency) -> str:
             detail="Incorrect email or password",
         )
     token = create_access_token({"sub": user.email, "id": user.id})
+    logger.info(f"User logged in: {user.email}")
     return token
 
 
@@ -49,14 +55,17 @@ def register_user(db: db_dependency, email: str, password: str) -> User:
         User: Newly created user
 
     Raises:
-        HTTPException: Raised when the user's email already exists
+        ConflictException: Raised when the user's email already exists
     """
     db_user = db.query(User).filter(User.email == email).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise ConflictException(detail="Email already registered")
     hashed = get_password_hash(password)
     user = User(email=email, hashed_password=hashed, role=UserRole.user)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    with db_transaction(db):
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    logger.info(f"New user registered: {user.email} with role {user.role}")
     return user
