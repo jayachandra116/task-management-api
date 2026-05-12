@@ -32,7 +32,7 @@ async def validation_exception_handler(
 ) -> JSONResponse:
     """Catches the Pydantic validation errors(422) and returns a clean, structured error response"""
     errors = []
-    for error in exec.errors:
+    for error in exec.errors():
         errors.append(
             {
                 "field": "->".join(str(e) for e in error["loc"]),

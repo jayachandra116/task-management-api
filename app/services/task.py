@@ -78,7 +78,7 @@ def create_new_task(
         db.commit()
         db.refresh(new_task)
 
-    logger.info(f"Task created: '{new_task.title()}' by user {current_user.email}")
+    logger.info(f"Task created: '{new_task.title}' by user {current_user.email}")
     return new_task
 
 

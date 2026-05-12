@@ -13,7 +13,7 @@ def test_register_duplicate_email(client, regular_user):
         "/api/v1/auth/register",
         json={"email": "user@test.com", "password": "password123"},
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
 
 
 def test_login_success(client, regular_user):
