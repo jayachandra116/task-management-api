@@ -34,7 +34,7 @@ def get_task_or_404(task_id: int, db: db_dependency) -> Task:
     """
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
-        raise NotFoundException("Task")
+        raise NotFoundException("Task not found")
     return task
 
 

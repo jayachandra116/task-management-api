@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.exceptions import BadRequestException, NotFoundException
+from app.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.models import User
 from app.core.security import verify_password, get_password_hash
 import logging
@@ -51,7 +51,7 @@ def change_user_password(
         BadRequestException: Raised when the current password is incorrect
     """
     if not verify_password(current_password, user.hashed_password):
-        raise BadRequestException("Current password is incorrect")
+        raise ForbiddenException("Current password is incorrect")
     with db_transaction(db):
         user.hashed_password = get_password_hash(new_password)
         db.commit()
