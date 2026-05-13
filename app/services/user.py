@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.exceptions import BadRequestException, ForbiddenException, NotFoundException
+from app.exceptions import ForbiddenException, NotFoundException
 from app.models import User
 from app.core.security import verify_password, get_password_hash
 import logging
