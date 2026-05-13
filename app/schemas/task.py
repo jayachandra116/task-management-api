@@ -37,7 +37,7 @@ class TaskUpdate(BaseModel):
 class TaskResponse(BaseModel):
     """Response: Full task details"""
 
-    id: int = Field("id of the task")
+    id: int = Field(description="id of the task")
     title: str = Field(description="Title of the task")
     description: Optional[str] = Field(description="Description of the task")
     complete: bool = Field(description="Status of the task")
