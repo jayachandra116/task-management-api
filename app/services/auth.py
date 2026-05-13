@@ -1,11 +1,11 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.db.session import get_db
-from app.exceptions import ConflictException
+from app.exceptions import ConflictException, NotFoundException, UnAuthorizedException
 from app.models import User
 from app.models.user import UserRole
 import logging
@@ -29,15 +29,14 @@ def authenticate_user(email: str, password: str, db: db_dependency) -> str:
         str: User token
 
     Raises:
-        HTTPException: If the email or password is incorrect
-
+        NotFoundException: If the user with the email do not exist
+        UnAuthorizedException: If the user's email or password do not match
     """
     user = db.query(User).filter(User.email == email).first()
-    if not user or not verify_password(password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-        )
+    if not user:
+        raise NotFoundException("User does not exist")
+    if not verify_password(password, user.hashed_password):
+        raise UnAuthorizedException(detail="Incorrect email or password")
     token = create_access_token({"sub": user.email, "id": user.id})
     logger.info(f"User logged in: {user.email}")
     return token
