@@ -1,5 +1,7 @@
 def test_get_own_profile(client, user_token, regular_user):
-    response = client.get("/api/v1/user/me", headers={"Authorization": f"Bearer {user_token}"})
+    response = client.get(
+        "/api/v1/user/me", headers={"Authorization": f"Bearer {user_token}"}
+    )
     assert response.status_code == 200
     assert response.json()["email"] == regular_user.email
     assert "password" not in response.json()
