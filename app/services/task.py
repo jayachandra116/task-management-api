@@ -1,16 +1,20 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Query, status
+from fastapi import Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.db.session import get_db
+from app.exceptions import NotFoundException
 from app.models import User, UserRole, Task
 from app.schemas.filters import TaskFilterParams
 from app.schemas.task import TaskCreate, TaskUpdate
+from app.utils.db import db_transaction
 from app.utils.filters import apply_task_filters
 from app.utils.pagination import paginate
+import logging
 
+logger = logging.getLogger(__name__)
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[User, Depends(deps.get_current_user)]
 
@@ -26,11 +30,11 @@ def get_task_or_404(task_id: int, db: db_dependency) -> Task:
         Task: Task to get
 
     Raises:
-        HTTPException: Raised when the task with id is not found
+        NotFoundException: Raised when the task with id is not found
     """
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
+        raise NotFoundException("Task not found")
     return task
 
 
@@ -42,13 +46,11 @@ def check_task_owership(task: Task, current_user: User) -> None:
         current_user (User): User to check against
 
     Raises:
-        HTTPException: Raised when the current user doesnt own the task and the current user has no admin role
+        NotFoundException: Raised when the current user doesnt own the task and the current user has no admin role
 
     """
     if current_user.role != UserRole.admin and task.owner_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-        )
+        raise NotFoundException("Task")
 
 
 def create_new_task(
@@ -70,9 +72,13 @@ def create_new_task(
         complete=False,
         owner_id=current_user.id,
     )
-    db.add(new_task)
-    db.commit()
-    db.refresh(new_task)
+
+    with db_transaction(db):
+        db.add(new_task)
+        db.commit()
+        db.refresh(new_task)
+
+    logger.info(f"Task created: '{new_task.title}' by user {current_user.email}")
     return new_task
 
 
@@ -136,11 +142,13 @@ def update_task_by_id(
     """
     task = get_task_or_404(task_id, db)
     check_task_owership(task, current_user)
-    updates = payload.model_dump(exclude_unset=True)
-    for field, value in updates.items():
-        setattr(task, field, value)
-    db.commit()
-    db.refresh(task)
+    with db_transaction(db):
+        updates = payload.model_dump(exclude_unset=True)
+        for field, value in updates.items():
+            setattr(task, field, value)
+        db.commit()
+        db.refresh(task)
+    logger.info(f"Task updated: '{task.title}' by user {current_user.email}")
     return task
 
 
@@ -156,5 +164,8 @@ def delete_task_by_id(
     """
     task = get_task_or_404(task_id, db)
     check_task_owership(task, current_user)
-    db.delete(task)
-    db.commit()
+    with db_transaction(db):
+        db.delete(task)
+        db.commit()
+
+    logger.info(f"Task deleted: '{task.title}' by user {current_user.email}")

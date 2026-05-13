@@ -1,7 +1,7 @@
-from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from starlette import status
+from typing import Annotated, Optional
 
 from app.api.deps import get_current_user
 from app.db.session import get_db

@@ -1,14 +1,17 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette import status
 
 from app.db.session import get_db
+from app.exceptions import ForbiddenException
 from app.schemas.user import Token, UserCreate, UserResponse
 from app.services.auth import authenticate_user, register_user
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -40,5 +43,5 @@ async def register(user: UserCreate, db: db_dependency):
 async def login(form: oauth_dependency, db: db_dependency):
     token = authenticate_user(form.username, form.password, db)
     if not token:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise ForbiddenException(detail="Invalid credentials")
     return {"access_token": token, "token_type": "bearer"}

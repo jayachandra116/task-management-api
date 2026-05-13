@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
 from app.db.session import get_db
+from app.exceptions import ForbiddenException, NotFoundException
 from app.models import User, UserRole
 
 
@@ -32,15 +33,10 @@ def get_current_user(
     try:
         user = decode_access_token(token=token)
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
+        raise ForbiddenException("Could not validate credentials")
     user = db.query(User).filter(User.id == user.get("id")).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User no longer exists"
-        )
+        raise NotFoundException("User no longer exists")
     return user
 
 
@@ -87,9 +83,7 @@ def require_admin(current_user: User = Depends(get_current_user)) -> User:
     """
 
     if current_user.role != UserRole.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
-        )
+        raise ForbiddenException("Admin access required")
     return current_user
 
 
