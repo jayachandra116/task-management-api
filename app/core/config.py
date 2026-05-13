@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import EmailStr, field_validator
+from pydantic import EmailStr, field_validator, SecretStr
 from typing import Any
 from functools import lru_cache
 
@@ -8,6 +8,13 @@ from functools import lru_cache
 def get_settings(env_file: str = ".env"):
     """
     Creates a cached instance of the settings.
+
+    Args:
+        emv_file (str): Environment file to get the settings from.
+            Defaults to '.env'
+
+    Returns:
+        Settings: Settings object
     """
     # print(f"Creating settings from file: {env_file}")
     return Settings(_env_file=env_file, _env_file_encoding="utf-8")
@@ -15,17 +22,17 @@ def get_settings(env_file: str = ".env"):
 
 class Settings(BaseSettings):
     # --- Auth Settings ---
-    SECRET_KEY: str
+    SECRET_KEY: SecretStr
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # --- Initial Admin Settings ---
     FIRST_ADMIN_EMAIL: EmailStr
-    FIRST_ADMIN_PASSWORD: str
+    FIRST_ADMIN_PASSWORD: SecretStr
 
     # --- Database Settings ---
     POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+    POSTGRES_PASSWORD: SecretStr
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
@@ -52,7 +59,7 @@ class Settings(BaseSettings):
             return v
         # Otherwise, build it from components (useful for local vs docker)
         user = info.data.get("POSTGRES_USER")
-        password = info.data.get("POSTGRES_PASSWORD")
+        password = info.data.get("POSTGRES_PASSWORD").get_secret_value()
         server = info.data.get("POSTGRES_SERVER")
         port = info.data.get("POSTGRES_PORT")
         db = info.data.get("POSTGRES_DB")

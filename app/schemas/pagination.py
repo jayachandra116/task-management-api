@@ -18,16 +18,16 @@ class PaginationParams(BaseModel):
 class PaginationMeta(BaseModel):
     """Metadata returned with every paginated response."""
 
-    page: int
-    size: int
-    total_items: int
-    total_pages: int
-    has_next: bool
-    has_previous: bool
+    page: int = Field(description="Page number")
+    size: int = Field(description="Size of the page")
+    total_items: int = Field(description="Total number of items")
+    total_pages: int = Field(description="Total number of pages")
+    has_next: bool = Field(description="If the response has a next page")
+    has_previous: bool = Field(description="If the response has a previous page")
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
     """Generic paginaed response wrapping any list of items."""
 
-    items: List[T]
-    meta: PaginationMeta
+    items: List[T] = Field(description="List of items")
+    meta: PaginationMeta = Field(description="Metadata about the response")
