@@ -45,4 +45,4 @@ def test_list_users_as_regular_user(client, user_token):
         "/api/v1/users/",
         headers={"Authorization": f"Bearer {user_token}"},
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
