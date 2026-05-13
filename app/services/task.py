@@ -50,7 +50,7 @@ def check_task_owership(task: Task, current_user: User) -> None:
 
     """
     if current_user.role != UserRole.admin and task.owner_id != current_user.id:
-        raise NotFoundException("Task")
+        raise NotFoundException("Task not found for this user")
 
 
 def create_new_task(

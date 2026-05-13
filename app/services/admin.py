@@ -58,7 +58,7 @@ def get_user(
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise NotFoundException("User")
+        raise NotFoundException("User does not exist")
     return user
 
 
@@ -88,7 +88,7 @@ def update_user_role(
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise NotFoundException("User")
+        raise NotFoundException("User does not exist")
 
     with db_transaction(db):
         user.role = payload.role
@@ -119,7 +119,7 @@ def delete_user(
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise NotFoundException("User")
+        raise NotFoundException("User does not exist")
 
     with db_transaction(db):
         db.delete(user)

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.exceptions import ForbiddenException, NotFoundException
+from app.exceptions import ForbiddenException, NotFoundException, UnAuthorizedException
 from app.models import User
 from app.core.security import verify_password, get_password_hash
 import logging
@@ -32,7 +32,7 @@ def get_user_by_id(user_id: int, db: db_dependency) -> User:
     """
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise NotFoundException("User")
+        raise NotFoundException("User does not exist")
     return user
 
 
@@ -48,10 +48,10 @@ def change_user_password(
         db (Session): Database session to use
 
     Raises:
-        BadRequestException: Raised when the current password is incorrect
+        UnAuthorizedException: Raised when the current password is incorrect
     """
     if not verify_password(current_password, user.hashed_password):
-        raise ForbiddenException("Current password is incorrect")
+        raise UnAuthorizedException("Current password is incorrect")
     with db_transaction(db):
         user.hashed_password = get_password_hash(new_password)
         db.commit()
