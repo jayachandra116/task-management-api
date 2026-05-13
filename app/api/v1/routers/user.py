@@ -16,7 +16,7 @@ from app.schemas.user import (
 from app.services.user import change_user_password
 from app.services import admin
 
-router = APIRouter(prefix="/user", tags=["User"])
+router = APIRouter(prefix="/users", tags=["Users"])
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[User, Depends(get_current_user)]

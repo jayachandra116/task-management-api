@@ -1,6 +1,6 @@
 def test_get_own_profile(client, user_token, regular_user):
     response = client.get(
-        "/api/v1/user/me", headers={"Authorization": f"Bearer {user_token}"}
+        "/api/v1/users/me", headers={"Authorization": f"Bearer {user_token}"}
     )
     assert response.status_code == 200
     assert response.json()["email"] == regular_user.email
@@ -9,7 +9,7 @@ def test_get_own_profile(client, user_token, regular_user):
 
 def test_change_password_success(client, user_token):
     response = client.patch(
-        "/api/v1/user/me/password",
+        "/api/v1/users/me/password",
         json={
             "current_password": "testpass123",
             "new_password": "newpass456",
@@ -21,7 +21,7 @@ def test_change_password_success(client, user_token):
 
 def test_change_password_wrong_current(client, user_token):
     response = client.patch(
-        "/api/v1/user/me/password",
+        "/api/v1/users/me/password",
         json={
             "current_password": "wrongpass",
             "new_password": "newpass456",
@@ -33,7 +33,7 @@ def test_change_password_wrong_current(client, user_token):
 
 def test_list_users_as_admin(client, admin_token):
     response = client.get(
-        "/api/v1/user/",
+        "/api/v1/users/",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 200
@@ -42,7 +42,7 @@ def test_list_users_as_admin(client, admin_token):
 
 def test_list_users_as_regular_user(client, user_token):
     response = client.get(
-        "/api/v1/user/",
+        "/api/v1/users/",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 401

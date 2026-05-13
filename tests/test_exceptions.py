@@ -106,7 +106,7 @@ def test_db_transaction_rolls_back_on_integrity_error(client, user_token):
 
 def test_admin_change_own_role_returns_400(client, admin_token, admin_user):
     response = client.patch(
-        f"/api/v1/user/{admin_user.id}/role",
+        f"/api/v1/users/{admin_user.id}/role",
         json={"role": "user"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -115,7 +115,7 @@ def test_admin_change_own_role_returns_400(client, admin_token, admin_user):
 
 def test_admin_delete_self_returns_400(client, admin_token, admin_user):
     response = client.delete(
-        f"/api/v1/user/{admin_user.id}",
+        f"/api/v1/users/{admin_user.id}",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 400
