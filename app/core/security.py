@@ -13,7 +13,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
     Args:
         plain_password (str): Plain password to check
-        hashed_password (str): Hased password to check against
+        hashed_password (str): Hashed password to check against
 
     Returns:
         bool: Returns True If the plain password matched the hash, else False
