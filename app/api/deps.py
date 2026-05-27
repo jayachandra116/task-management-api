@@ -1,7 +1,6 @@
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
-from starlette import status
 from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
@@ -60,9 +59,8 @@ def require_role(*roles: UserRole):
 
     def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role not in roles:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. Required roles: {[r.value for r in roles]}",
+            raise ForbiddenException(
+                f"Access denied. Required roles: {[r.value for r in roles]}"
             )
         return current_user
 
@@ -100,8 +98,5 @@ def require_user(current_user: User = Depends(get_current_user)) -> User:
         HTTPException: Raised when the user has no 'user' role
     """
     if current_user.role != UserRole.user:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User role required",
-        )
+        raise ForbiddenException("User role required")
     return current_user

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.db.session import get_db
-from app.exceptions import ConflictException, NotFoundException, UnAuthorizedException
+from app.exceptions import ConflictException, UnAuthorizedException
 from app.models import User
 from app.models.user import UserRole
 import logging
