@@ -50,7 +50,7 @@ def require_role(*roles: UserRole):
         role checker funcion to be executed
 
     Raises:
-        HTTPException: Raised when the user doesnt have the requried roles
+        HTTPException: Raised when the user doesn't have the requried roles
 
     Usage:
         Depends(require_role(UserRole.admin))

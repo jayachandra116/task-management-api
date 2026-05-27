@@ -46,7 +46,7 @@ def check_task_owership(task: Task, current_user: User) -> None:
         current_user (User): User to check against
 
     Raises:
-        NotFoundException: Raised when the current user doesnt own the task and the current user has no admin role
+        NotFoundException: Raised when the current user doesn't own the task and the current user has no admin role
 
     """
     if current_user.role != UserRole.admin and task.owner_id != current_user.id:
